@@ -10,11 +10,3 @@
     "@anthropic-ai/sdk": "latest"
   }
 }
-```
-
-**4. `.gitignore`** - Was nicht hochgeladen werden soll
-```
-node_modules/
-.env.local
-dist/
-.wrangler/
