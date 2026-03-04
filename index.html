@@ -13,8 +13,8 @@
         
         body {
             font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
-            background: #0a0a0f;
-            color: #e0e0e0;
+            background: #f5f5f5;
+            color: #1a1a1a;
             min-height: 100vh;
             padding: 2rem;
             line-height: 1.6;
@@ -27,8 +27,8 @@
         
         h1 {
             font-size: 1.5rem;
-            font-weight: 400;
-            color: #a855f7;
+            font-weight: 600;
+            color: #6366f1;
             margin-bottom: 2rem;
             letter-spacing: 0.1em;
         }
@@ -42,10 +42,11 @@
         }
         
         .section {
-            background: #12121a;
+            background: #ffffff;
             border-radius: 8px;
             padding: 1.5rem;
-            border: 1px solid #1a1a25;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         
         .section-title {
@@ -54,6 +55,7 @@
             text-transform: uppercase;
             letter-spacing: 0.15em;
             margin-bottom: 1rem;
+            font-weight: 600;
         }
         
         .status {
@@ -68,19 +70,21 @@
             height: 8px;
             border-radius: 50%;
             background: #22c55e;
-            box-shadow: 0 0 10px #22c55e;
+            box-shadow: 0 0 6px rgba(34, 197, 94, 0.5);
         }
         
-        .status-dot.offline { background: #ef4444; box-shadow: 0 0 10px #ef4444; }
-        .status-dot.warning { background: #f59e0b; box-shadow: 0 0 10px #f59e0b; }
+        .status-dot.offline { background: #ef4444; box-shadow: 0 0 6px rgba(239, 68, 68, 0.5); }
+        .status-dot.warning { background: #f59e0b; box-shadow: 0 0 6px rgba(245, 158, 11, 0.5); }
         
         .label {
             color: #6b7280;
             min-width: 80px;
+            font-weight: 500;
         }
         
         .value {
-            color: #e0e0e0;
+            color: #1a1a1a;
+            font-weight: 500;
         }
         
         .agent {
@@ -91,9 +95,10 @@
         }
         
         .agent-name {
-            color: #a855f7;
+            color: #6366f1;
             min-width: 90px;
             font-size: 0.875rem;
+            font-weight: 600;
         }
         
         .agent-model {
@@ -124,10 +129,10 @@
         }
         
         .column {
-            background: #12121a;
+            background: #ffffff;
             border-radius: 8px;
             padding: 1rem;
-            border: 1px solid #1a1a25;
+            border: 1px solid #e0e0e0;
             min-height: 300px;
         }
         
@@ -137,7 +142,7 @@
             gap: 0.5rem;
             margin-bottom: 1rem;
             padding-bottom: 0.5rem;
-            border-bottom: 1px solid #2a2a3a;
+            border-bottom: 2px solid #e0e0e0;
         }
         
         .column-dot {
@@ -146,46 +151,49 @@
             border-radius: 50%;
         }
         
-        .column-dot.backlog { background: #f59e0b; box-shadow: 0 0 8px #f59e0b; }
-        .column-dot.in-progress { background: #6366f1; box-shadow: 0 0 8px #6366f1; }
-        .column-dot.review { background: #22c55e; box-shadow: 0 0 8px #22c55e; }
+        .column-dot.backlog { background: #f59e0b; box-shadow: 0 0 6px rgba(245, 158, 11, 0.4); }
+        .column-dot.in-progress { background: #6366f1; box-shadow: 0 0 6px rgba(99, 102, 241, 0.4); }
+        .column-dot.review { background: #22c55e; box-shadow: 0 0 6px rgba(34, 197, 94, 0.4); }
         .column-dot.done { background: #6b7280; }
         
         .column-name {
             font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            color: #a0a0b0;
+            color: #374151;
+            font-weight: 600;
         }
         
         .column-count {
             margin-left: auto;
-            background: #1a1a25;
+            background: #e5e7eb;
             padding: 0.125rem 0.5rem;
             border-radius: 4px;
             font-size: 0.75rem;
-            color: #6b7280;
+            color: #374151;
+            font-weight: 600;
         }
         
         .task-card {
-            background: #1a1a25;
+            background: #f9fafb;
             border-radius: 6px;
             padding: 0.75rem;
             margin-bottom: 0.5rem;
-            border: 1px solid #2a2a3a;
+            border: 1px solid #e5e7eb;
             cursor: pointer;
             transition: all 0.2s;
         }
         
         .task-card:hover {
             border-color: #6366f1;
-            box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.15);
         }
         
         .task-title {
             font-size: 0.875rem;
-            color: #e0e0e0;
+            color: #1a1a1a;
             margin-bottom: 0.25rem;
+            font-weight: 500;
         }
         
         .task-desc {
@@ -195,12 +203,13 @@
         
         .task-tag {
             display: inline-block;
-            background: #2a2a3a;
+            background: #e5e7eb;
             padding: 0.125rem 0.375rem;
             border-radius: 3px;
             font-size: 0.625rem;
-            color: #a0a0b0;
+            color: #374151;
             margin-top: 0.5rem;
+            font-weight: 500;
         }
         
         .add-task {
@@ -209,8 +218,8 @@
             justify-content: center;
             gap: 0.5rem;
             padding: 0.5rem;
-            background: transparent;
-            border: 1px dashed #2a2a3a;
+            background: #f9fafb;
+            border: 1px dashed #d1d5db;
             border-radius: 6px;
             color: #6b7280;
             cursor: pointer;
@@ -221,12 +230,13 @@
         .add-task:hover {
             border-color: #6366f1;
             color: #6366f1;
+            background: #f3f4f6;
         }
         
         /* Divider */
         .divider {
             height: 1px;
-            background: linear-gradient(90deg, transparent, #2a2a3a, transparent);
+            background: linear-gradient(90deg, transparent, #d1d5db, transparent);
             margin: 1.5rem 0;
         }
         
@@ -247,15 +257,17 @@
             color: #6366f1;
             text-decoration: none;
             font-size: 0.875rem;
+            font-weight: 500;
         }
         
         .link-item a:hover {
-            color: #a855f7;
+            color: #4f46e5;
+            text-decoration: underline;
         }
         
         /* Timestamp */
         .timestamp {
-            color: #4b5563;
+            color: #9ca3af;
             font-size: 0.75rem;
             margin-top: 2rem;
             text-align: right;
