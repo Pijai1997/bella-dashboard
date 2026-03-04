@@ -542,6 +542,7 @@
                             <span class="column-count">0</span>
                         </div>
                         <div class="tasks" id="in_progress-tasks"></div>
+                        <button class="add-task" onclick="addTask('in_progress')">+ Add</button>
                     </div>
                     
                     <!-- Review -->
@@ -552,6 +553,7 @@
                             <span class="column-count">0</span>
                         </div>
                         <div class="tasks" id="review-tasks"></div>
+                        <button class="add-task" onclick="addTask('review')">+ Add</button>
                     </div>
                     
                     <!-- Done -->
@@ -562,6 +564,7 @@
                             <span class="column-count">0</span>
                         </div>
                         <div class="tasks" id="done-tasks"></div>
+                        <button class="add-task" onclick="addTask('done')">+ Add</button>
                     </div>
                 </div>
             </div>
@@ -611,6 +614,46 @@
         </div>
     </div>
     
+    <!-- Task Modal -->
+    <div class="modal" id="task-modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <div class="modal-title">New Task</div>
+                <button class="modal-close" onclick="closeTaskModal()">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 1rem;">
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Title</label>
+                    <input type="text" id="task-title" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.875rem;" placeholder="Task title...">
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Description</label>
+                    <textarea id="task-desc" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.875rem; min-height: 80px;" placeholder="Task description..."></textarea>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Tag</label>
+                    <select id="task-tag" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.875rem;">
+                        <option value="business">Business</option>
+                        <option value="system">System</option>
+                        <option value="crypto">Crypto</option>
+                        <option value="dashboard">Dashboard</option>
+                        <option value="agent">Agent</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Priority</label>
+                    <select id="task-priority" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.875rem;">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <button onclick="saveNewTask()" style="width: 100%; padding: 0.75rem; background: #6366f1; color: white; border: none; border-radius: 6px; font-size: 0.875rem; cursor: pointer; font-weight: 500;">Create Task</button>
+            </div>
+        </div>
+    </div>
+    
     <script>
         // Sample tasks
         const tasks = [
@@ -643,22 +686,43 @@
         }
         
         function addTask(status) {
-            const title = prompt('Task title:');
-            if (!title) return;
+            currentTaskStatus = status;
+            document.getElementById('task-modal').classList.add('active');
+            document.getElementById('task-title').focus();
+        }
+        
+        function closeTaskModal() {
+            document.getElementById('task-modal').classList.remove('active');
+            document.getElementById('task-title').value = '';
+            document.getElementById('task-desc').value = '';
+        }
+        
+        function saveNewTask() {
+            const title = document.getElementById('task-title').value.trim();
+            const desc = document.getElementById('task-desc').value.trim();
+            const tag = document.getElementById('task-tag').value;
+            const priority = document.getElementById('task-priority').value;
             
-            const desc = prompt('Task description:') || '';
+            if (!title) {
+                alert('Please enter a title');
+                return;
+            }
             
             tasks.push({
                 id: Date.now(),
                 title,
                 desc,
-                status,
-                tag: 'new'
+                status: currentTaskStatus,
+                tag,
+                priority
             });
             
             renderTasks();
             saveTasks();
+            closeTaskModal();
         }
+        
+        let currentTaskStatus = 'backlog';
         
         function saveTasks() {
             localStorage.setItem('bella_tasks', JSON.stringify(tasks));
