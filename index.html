@@ -265,12 +265,151 @@
             text-decoration: underline;
         }
         
-        /* Timestamp */
-        .timestamp {
-            color: #9ca3af;
+        /* Files Section */
+        .files-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .file-card {
+            background: #f9fafb;
+            border-radius: 6px;
+            padding: 1rem;
+            border: 1px solid #e5e7eb;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .file-card:hover {
+            border-color: #6366f1;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.15);
+        }
+        
+        .file-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .file-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #1a1a1a;
+            word-break: break-all;
+        }
+        
+        .file-type {
             font-size: 0.75rem;
-            margin-top: 2rem;
-            text-align: right;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+        
+        .file-size {
+            font-size: 0.625rem;
+            color: #9ca3af;
+        }
+        
+        .folder-icon {
+            color: #f59e0b;
+        }
+        
+        .md-icon {
+            color: #6366f1;
+        }
+        
+        .json-icon {
+            color: #22c55e;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 2rem;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            width: 90%;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+        }
+        
+        .modal-close:hover {
+            color: #1a1a1a;
+        }
+        
+        .modal-body {
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.75rem;
+            white-space: pre-wrap;
+            word-break: break-all;
+            background: #f9fafb;
+            padding: 1rem;
+            border-radius: 6px;
+            max-height: 50vh;
+            overflow-y: auto;
+        }
+        
+        /* Path breadcrumb */
+        .path-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .path-segment {
+            color: #6366f1;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        
+        .path-segment:hover {
+            text-decoration: underline;
+        }
+        
+        .path-separator {
+            color: #9ca3af;
         }
         
         /* Responsive */
@@ -281,10 +420,16 @@
             .kanban-board {
                 grid-template-columns: repeat(2, 1fr);
             }
+            .files-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
         
         @media (max-width: 600px) {
             .kanban-board {
+                grid-template-columns: 1fr;
+            }
+            .files-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -441,7 +586,29 @@
             </div>
         </div>
         
+        <!-- Files Section -->
+        <div class="section">
+            <div class="section-title">Files</div>
+            <div class="path-breadcrumb" id="path-breadcrumb">
+                <span class="path-segment" onclick="navigateTo('root')">root</span>
+            </div>
+            <div class="files-grid" id="files-grid">
+                <!-- Files will be loaded here -->
+            </div>
+        </div>
+        
         <div class="timestamp" id="timestamp">Last sync: Loading...</div>
+    </div>
+    
+    <!-- File Modal -->
+    <div class="modal" id="file-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modal-title">File Content</div>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body">Loading...</div>
+        </div>
     </div>
     
     <script>
@@ -546,8 +713,116 @@
                 `Last sync: ${now.toLocaleDateString('de-DE')} ${now.toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit'})} CET`;
         }
         
+        // Files Browser
+        const filesData = {
+            root: [
+                { name: 'MEMORY.md', type: 'md', size: '2.1 KB' },
+                { name: 'AGENTS.md', type: 'md', size: '4.5 KB' },
+                { name: 'SOUL.md', type: 'md', size: '3.2 KB' },
+                { name: 'TOOLS.md', type: 'md', size: '1.8 KB' },
+                { name: 'USER.md', type: 'md', size: '0.5 KB' },
+                { name: 'memory/', type: 'folder', size: '' },
+                { name: 'skills/', type: 'folder', size: '' },
+                { name: 'config/', type: 'folder', size: '' },
+            ],
+            'memory/': [
+                { name: '2026-03-04.md', type: 'md', size: '5.2 KB' },
+                { name: 'credentials.md', type: 'md', size: '1.0 KB' },
+                { name: 'led-3d-bilder-analyse.md', type: 'md', size: '3.5 KB' },
+            ],
+            'skills/': [
+                { name: 'self-improving/', type: 'folder', size: '' },
+                { name: 'business-plan/', type: 'folder', size: '' },
+                { name: 'mission-control/', type: 'folder', size: '' },
+            ],
+            'config/': [
+                { name: 'subagents.json', type: 'json', size: '2.8 KB' },
+            ]
+        };
+        
+        let currentPath = 'root';
+        
+        function getIcon(file) {
+            if (file.type === 'folder') return '📁';
+            if (file.type === 'md') return '📝';
+            if (file.type === 'json') return '📋';
+            return '📄';
+        }
+        
+        function getIconClass(file) {
+            if (file.type === 'folder') return 'folder-icon';
+            if (file.type === 'md') return 'md-icon';
+            if (file.type === 'json') return 'json-icon';
+            return '';
+        }
+        
+        function renderFiles() {
+            const container = document.getElementById('files-grid');
+            const files = filesData[currentPath] || [];
+            
+            container.innerHTML = files.map(file => `
+                <div class="file-card" onclick="openFile('${file.name}', '${file.type}')">
+                    <div class="file-icon ${getIconClass(file)}">${getIcon(file)}</div>
+                    <div class="file-name">${file.name}</div>
+                    <div class="file-type">${file.type === 'folder' ? 'Folder' : file.type.toUpperCase()}</div>
+                    <div class="file-size">${file.size}</div>
+                </div>
+            `).join('');
+            
+            updateBreadcrumb();
+        }
+        
+        function updateBreadcrumb() {
+            const breadcrumb = document.getElementById('path-breadcrumb');
+            const parts = currentPath.split('/').filter(p => p);
+            
+            let html = '<span class="path-segment" onclick="navigateTo(\'root\')">root</span>';
+            let path = '';
+            
+            parts.forEach((part, i) => {
+                path += (i > 0 ? '/' : '') + part;
+                html += `<span class="path-separator">/</span>`;
+                html += `<span class="path-segment" onclick="navigateTo('${path}')">${part}</span>`;
+            });
+            
+            breadcrumb.innerHTML = html;
+        }
+        
+        function navigateTo(path) {
+            currentPath = path;
+            renderFiles();
+        }
+        
+        function openFile(name, type) {
+            if (type === 'folder') {
+                const newPath = currentPath === 'root' ? name : currentPath + name;
+                navigateTo(newPath);
+                return;
+            }
+            
+            // Show modal with file content
+            const modal = document.getElementById('file-modal');
+            const title = document.getElementById('modal-title');
+            const body = document.getElementById('modal-body');
+            
+            title.textContent = name;
+            body.textContent = 'File content would be loaded here...\n\n(This is a demo - connect to OpenClaw API to load real files)';
+            
+            modal.classList.add('active');
+        }
+        
+        function closeModal() {
+            document.getElementById('file-modal').classList.remove('active');
+        }
+        
+        // Close modal on outside click
+        document.getElementById('file-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'file-modal') closeModal();
+        });
+        
         // Init
         loadTasks();
+        renderFiles();
         updateTimestamp();
         setInterval(updateTimestamp, 60000);
     </script>
