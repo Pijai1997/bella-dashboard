@@ -683,6 +683,21 @@
                         <option value="high">High</option>
                     </select>
                 </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Subagent</label>
+                    <select id="task-subagent" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.875rem;">
+                        <option value="">Auto-Assign</option>
+                        <option value="architect">🏗️ Architect</option>
+                        <option value="reasoner">🧠 Reasoner</option>
+                        <option value="coder">💻 Coder</option>
+                        <option value="vision">👁️ Vision</option>
+                        <option value="quick">⚡ Quick</option>
+                        <option value="researcher">🔍 Researcher</option>
+                        <option value="writer">✍️ Writer</option>
+                        <option value="creator">🎨 Creator</option>
+                        <option value="business">💼 Business</option>
+                    </select>
+                </div>
                 <button onclick="saveNewTask()" style="width: 100%; padding: 0.75rem; background: #6366f1; color: white; border: none; border-radius: 6px; font-size: 0.875rem; cursor: pointer; font-weight: 500;">Create Task</button>
             </div>
         </div>
@@ -725,6 +740,18 @@
         function renderTasks() {
             const columns = ['backlog', 'in_progress', 'review', 'done'];
             
+            const subagentEmojis = {
+                'architect': '🏗️',
+                'reasoner': '🧠',
+                'coder': '💻',
+                'vision': '👁️',
+                'quick': '⚡',
+                'researcher': '🔍',
+                'writer': '✍️',
+                'creator': '🎨',
+                'business': '💼'
+            };
+            
             columns.forEach(status => {
                 const container = document.getElementById(`${status}-tasks`);
                 const filtered = tasks.filter(t => t.status === status);
@@ -733,8 +760,12 @@
                     <div class="task-card" draggable="true" data-id="${task.id}">
                         <div class="task-title">${task.title}</div>
                         ${task.desc ? `<div class="task-desc">${task.desc}</div>` : ''}
-                        <span class="task-tag">${task.tag || 'task'}</span>
-                        ${task.priority ? `<span class="task-tag" style="margin-left: 0.25rem; background: ${task.priority === 'high' ? '#fee2e2' : task.priority === 'medium' ? '#fef3c7' : '#e5e7eb'}; color: ${task.priority === 'high' ? '#ef4444' : task.priority === 'medium' ? '#d97706' : '#374151'};">${task.priority}</span>` : ''}
+                        <div style="margin-top: 0.5rem;">
+                            <span class="task-tag">${task.tag || 'task'}</span>
+                            ${task.priority ? `<span class="task-tag" style="margin-left: 0.25rem; background: ${task.priority === 'high' ? '#fee2e2' : task.priority === 'medium' ? '#fef3c7' : '#e5e7eb'}; color: ${task.priority === 'high' ? '#ef4444' : task.priority === 'medium' ? '#d97706' : '#374151'};">${task.priority}</span>` : ''}
+                            ${task.subagent ? `<span class="task-tag" style="margin-left: 0.25rem; background: #ede9fe; color: #6366f1;">${subagentEmojis[task.subagent] || '🤖'} ${task.subagent}</span>` : ''}
+                        </div>
+                        ${status === 'in_progress' && task.subagent ? `<div style="margin-top: 0.5rem; font-size: 0.625rem; color: #6366f1; font-weight: 500;">⏳ ${task.subagent.charAt(0).toUpperCase() + task.subagent.slice(1)} working...</div>` : ''}
                         <div class="task-actions">
                             <button class="task-btn task-btn-trigger" onclick="triggerTask(${task.id})">▶ Trigger</button>
                             <button class="task-btn task-btn-delete" onclick="deleteTask(${task.id})">✕</button>
@@ -765,6 +796,7 @@
             const desc = document.getElementById('task-desc').value.trim();
             const tag = document.getElementById('task-tag').value;
             const priority = document.getElementById('task-priority').value;
+            const subagent = document.getElementById('task-subagent').value;
             
             if (!title) {
                 alert('Please enter a title');
@@ -777,7 +809,8 @@
                 desc,
                 status: currentTaskStatus,
                 tag,
-                priority
+                priority,
+                subagent
             });
             
             renderTasks();
