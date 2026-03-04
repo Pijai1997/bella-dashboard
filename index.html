@@ -246,6 +246,43 @@
             background: #fecaca;
         }
         
+        .task-progress {
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background: #f0f9ff;
+            border-radius: 4px;
+            font-size: 0.625rem;
+            color: #0369a1;
+        }
+        
+        .task-input {
+            display: none;
+            margin-top: 0.5rem;
+        }
+        
+        .task-input.active {
+            display: block;
+        }
+        
+        .task-input input {
+            width: 100%;
+            padding: 0.375rem;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 0.625rem;
+        }
+        
+        .task-input button {
+            margin-top: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            background: #22c55e;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.625rem;
+            cursor: pointer;
+        }
+        
         .add-task {
             display: flex;
             align-items: center;
@@ -696,6 +733,7 @@
                         <option value="writer">✍️ Writer</option>
                         <option value="creator">🎨 Creator</option>
                         <option value="business">💼 Business</option>
+                        <option value="imagegen">🖼️ ImageGen</option>
                     </select>
                 </div>
                 <button onclick="saveNewTask()" style="width: 100%; padding: 0.75rem; background: #6366f1; color: white; border: none; border-radius: 6px; font-size: 0.875rem; cursor: pointer; font-weight: 500;">Create Task</button>
@@ -749,7 +787,8 @@
                 'researcher': '🔍',
                 'writer': '✍️',
                 'creator': '🎨',
-                'business': '💼'
+                'business': '💼',
+                'imagegen': '🖼️'
             };
             
             columns.forEach(status => {
@@ -765,9 +804,15 @@
                             ${task.priority ? `<span class="task-tag" style="margin-left: 0.25rem; background: ${task.priority === 'high' ? '#fee2e2' : task.priority === 'medium' ? '#fef3c7' : '#e5e7eb'}; color: ${task.priority === 'high' ? '#ef4444' : task.priority === 'medium' ? '#d97706' : '#374151'};">${task.priority}</span>` : ''}
                             ${task.subagent ? `<span class="task-tag" style="margin-left: 0.25rem; background: #ede9fe; color: #6366f1;">${subagentEmojis[task.subagent] || '🤖'} ${task.subagent}</span>` : ''}
                         </div>
-                        ${status === 'in_progress' && task.subagent ? `<div style="margin-top: 0.5rem; font-size: 0.625rem; color: #6366f1; font-weight: 500;">⏳ ${task.subagent.charAt(0).toUpperCase() + task.subagent.slice(1)} working...</div>` : ''}
+                        ${status === 'in_progress' && task.subagent ? `<div class="task-progress">⏳ ${task.subagent.charAt(0).toUpperCase() + task.subagent.slice(1)} working...</div>` : ''}
+                        ${task.progress ? `<div class="task-progress">${task.progress}</div>` : ''}
+                        <div class="task-input" id="input-${task.id}">
+                            <input type="text" placeholder="Enter input for ${task.subagent || 'agent'}..." onkeypress="if(event.key==='Enter')submitInput(${task.id})">
+                            <button onclick="submitInput(${task.id})">Send</button>
+                        </div>
                         <div class="task-actions">
-                            <button class="task-btn task-btn-trigger" onclick="triggerTask(${task.id})">▶ Trigger</button>
+                            <button class="task-btn task-btn-trigger" onclick="triggerTask(${task.id})">▶</button>
+                            <button class="task-btn" style="background:#e0e7ff;color:#4f46e5;" onclick="toggleInput(${task.id})">💬</button>
                             <button class="task-btn task-btn-delete" onclick="deleteTask(${task.id})">✕</button>
                         </div>
                     </div>
@@ -777,6 +822,28 @@
                 const countEl = container.closest('.column').querySelector('.column-count');
                 countEl.textContent = filtered.length;
             });
+        }
+        
+        function toggleInput(id) {
+            const inputDiv = document.getElementById(`input-${id}`);
+            inputDiv.classList.toggle('active');
+        }
+        
+        function submitInput(id) {
+            const inputDiv = document.getElementById(`input-${id}`);
+            const input = inputDiv.querySelector('input');
+            const value = input.value.trim();
+            
+            if (!value) return;
+            
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                task.progress = `📝 Input: "${value}"`;
+                task.needsInput = false;
+                renderTasks();
+                saveTasks();
+                input.value = '';
+            }
         }
         
         function addTask(status) {
