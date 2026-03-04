@@ -689,14 +689,38 @@
     </div>
     
     <script>
-        // Sample tasks
-        const tasks = [
-            { id: 1, title: 'Business Plan finalisieren', desc: 'LED 3D-Bilder', status: 'done', tag: 'business' },
-            { id: 2, title: 'Dashboard aufsetzen', desc: 'Mission Control einrichten', status: 'done', tag: 'system' },
-            { id: 3, title: 'GitHub Pages aktivieren', desc: 'Dashboard deployen', status: 'done', tag: 'system' },
-            { id: 4, title: 'Skills erweitern', desc: 'Neue Skills installieren', status: 'backlog', tag: 'system' },
-            { id: 5, title: 'Crypto Wallet Monitor', desc: 'Wallet-Tracking einrichten', status: 'backlog', tag: 'crypto' },
-        ];
+        // Tasks loaded from data/tasks.json + localStorage
+        let tasks = [];
+        
+        // Load tasks from JSON file
+        async function loadTasksFromServer() {
+            try {
+                const response = await fetch('data/tasks.json');
+                const data = await response.json();
+                if (data.tasks) {
+                    // Merge with localStorage
+                    const saved = localStorage.getItem('bella_tasks');
+                    const localTasks = saved ? JSON.parse(saved) : [];
+                    
+                    // Server tasks as base, local tasks override
+                    const serverTasks = data.tasks.map(t => ({...t, id: parseInt(t.id.replace('task_', '')) || t.id}));
+                    const localIds = localTasks.map(t => t.id);
+                    
+                    // Add new local tasks not on server
+                    const newLocal = localTasks.filter(t => !serverTasks.find(s => s.id === t.id));
+                    
+                    tasks = [...serverTasks, ...newLocal];
+                    renderTasks();
+                }
+            } catch (e) {
+                // Fallback to localStorage only
+                const saved = localStorage.getItem('bella_tasks');
+                if (saved) {
+                    tasks = JSON.parse(saved);
+                    renderTasks();
+                }
+            }
+        }
         
         function renderTasks() {
             const columns = ['backlog', 'in_progress', 'review', 'done'];
@@ -765,6 +789,15 @@
         
         function saveTasks() {
             localStorage.setItem('bella_tasks', JSON.stringify(tasks));
+            // Note: To sync back to server, we'd need a backend API
+            // For now, tasks persist in localStorage
+        }
+        
+        async function syncTasksToServer() {
+            // This would require a backend API
+            // For GitHub Pages static hosting, we can't write directly
+            // Tasks are synced via localStorage + manual git push
+            console.log('Tasks saved to localStorage. Sync via git push.');
         }
         
         function triggerTask(id) {
@@ -950,7 +983,7 @@
         });
         
         // Init
-        loadTasks();
+        loadTasksFromServer();
         renderFiles();
         updateTimestamp();
         setInterval(updateTimestamp, 60000);
